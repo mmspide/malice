@@ -7,6 +7,8 @@
 > Malice's mission is to be a free open source version of VirusTotal that anyone can use at any scale from an independent researcher to a fortune 500 company.
 
 ### 🎉 Latest Release: v0.4.0 (Modernization Release)
+**Released:** December 31, 2025
+
 **Major improvements:** Enhanced security, performance optimization, graceful shutdown, connection pooling, and comprehensive error handling. [See full changelog →](RELEASE_NOTES_v0.4.0.md)
 
 ---

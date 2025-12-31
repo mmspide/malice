@@ -1,5 +1,7 @@
 # Malice Go Best Practices & Coding Standards
 
+**Last Updated:** December 31, 2025
+
 ## 📋 فهرست
 1. [Error Handling](#error-handling)
 2. [Concurrency](#concurrency)

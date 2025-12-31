@@ -273,7 +273,7 @@ For issues or questions:
 
 **Tested On**: Ubuntu 22.04 LTS with Go 1.21, Docker 24.0+
 
-**Last Updated**: December 2025
+**Last Updated**: December 31, 2025
 
 **Compatibility**: Go 1.21+, Ubuntu 22.04 LTS, Docker 20.10+
 
