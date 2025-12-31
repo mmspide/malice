@@ -1,82 +1,55 @@
-version: "3"
+version: "3.8"
 
 services:
-  avg:
-    image: malice/avg
-    links:
-      - rethink
-    command: -t befb88b89c2eb401900a68e9f5b78764203f2b48264fcc3f7121bf04a57fd408
-    volumes:
-      - ../data/samples:/malware:ro
-    networks:
-      - malice
-  bitdefender:
-    image: malice/bitdefender
-    links:
-      - rethink
-    command: -t befb88b89c2eb401900a68e9f5b78764203f2b48264fcc3f7121bf04a57fd408
-    volumes:
-      - ../data/samples:/malware:ro
-    networks:
-      - malice
-  clamav:
-    image: malice/clamav
-    links:
-      - rethink
-    command: -t befb88b89c2eb401900a68e9f5b78764203f2b48264fcc3f7121bf04a57fd408
-    volumes:
-      - ../data/samples:/malware:ro
-    networks:
-      - malice
-  comodo:
-    image: malice/comodo
-    links:
-      - rethink
-    command: -t befb88b89c2eb401900a68e9f5b78764203f2b48264fcc3f7121bf04a57fd408
-    volumes:
-      - ../data/samples:/malware:ro
-    networks:
-      - malice
-  fprot:
-    image: malice/fprot
-    links:
-      - rethink
-    command: -t befb88b89c2eb401900a68e9f5b78764203f2b48264fcc3f7121bf04a57fd408
-    volumes:
-      - ../data/samples:/malware:ro
-    networks:
-      - malice
-  # ELK
-  elk:
-    image: blacktop/elk
+  # ELK Stack
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.0
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - xpack.security.enrollment.enabled=false
     ports:
       - "9200:9200"
-      - "80:80"
-    networks:
-      - malice
-  # LOGSTASH
-  logstash:
-    build: ./logstash
-    links:
-      - rethink
-      - elk:elasticsearch
-    networks:
-      - malice
-  # RETHINKDB
-  rethink:
-    container_name: rethink
-    image: rethinkdb
-    ports:
-      - "28015:28015"
-      - "8081:8080"
     volumes:
-      - malice:/data
+      - es_data:/usr/share/elasticsearch/data
     networks:
       - malice
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:9200/_cluster/health || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.10.0
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - malice
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:5601/api/status || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  # Sample malware plugins (commented out - uncomment as needed)
+  # clamav:
+  #   image: malice/clamav
+  #   depends_on:
+  #     - elasticsearch
+  #   environment:
+  #     - ELASTICSEARCH_HOSTS=elasticsearch:9200
+  #   volumes:
+  #     - ../data/samples:/malware:ro
+  #   networks:
+  #     - malice
 
 volumes:
-  ? malice
-  ? es_data
+  es_data:
 
 networks:
   malice:

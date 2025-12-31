@@ -6,8 +6,8 @@ import (
 	"runtime"
 	"strconv"
 
-	log "github.com/Sirupsen/logrus"
-	"github.com/urfave/cli"
+	log "github.com/sirupsen/logrus"
+	"github.com/urfave/cli/v2"
 
 	"github.com/maliceio/malice/commands"
 	"github.com/maliceio/malice/config"
@@ -78,10 +78,11 @@ func main() {
 	log.Debug("Malice Version: ", app.Version)
 
 	app.Flags = []cli.Flag{
-		cli.BoolFlag{
-			EnvVar: "MALICE_DEBUG",
-			Name:   "debug, D",
-			Usage:  "Enable debug mode",
+		&cli.BoolFlag{
+			Name:    "debug",
+			Aliases: []string{"D"},
+			Usage:   "Enable debug mode",
+			EnvVars: []string{"MALICE_DEBUG"},
 		},
 	}
 

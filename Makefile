@@ -1,102 +1,92 @@
+.PHONY: help build test clean setup install fmt lint docker run release
+
 REPO=malice
 NAME=engine
-VERSION=$(shell cat .release/VERSION)
+VERSION=$(shell cat .release/VERSION 2>/dev/null || echo "0.3.28")
 MESSAGE?="New release"
 
-# TODO remove \|/templates/\|/api
-SOURCE_FILES?=$$(go list ./... | grep -v '/vendor/\|/templates/\|/api')
-TEST_PATTERN?=.
-TEST_OPTIONS?=
+# Modern Go project settings
+GO := go
+GOFLAGS := -v
+GOTEST := go test
 
-GIT_COMMIT=$(git rev-parse HEAD)
-GIT_DIRTY=$(test -n "`git status --porcelain`" && echo "+CHANGES" || true)
-GIT_DESCRIBE=$(git describe --tags)
+GIT_COMMIT := $(shell git rev-parse HEAD 2>/dev/null || echo "unknown")
+GIT_DIRTY := $(shell git status --porcelain 2>/dev/null | grep -q . && echo "+CHANGES" || echo "")
+GIT_DESCRIBE := $(shell git describe --tags 2>/dev/null || echo "v0.3.28")
 
+# Targets
+.DEFAULT_GOAL := help
 
-bindata: ## Embed binary data in malice program
-	@echo "===> Embedding Binary Data"
-	# tomlupdate --path config/config.toml $(VERSION)
-	rm -f config/bindata.go plugins/bindata.go
-	go-bindata -pkg config -ignore=load.go config/...
-	mv bindata.go config/bindata.go
-	go-bindata -pkg plugins -ignore="^.*.go|\\.DS_Store" plugins/...
-	mv bindata.go plugins/bindata.go
+setup: ## Setup development environment - install dependencies
+	@echo "===> Setting up development environment for Go 1.21+"
+	$(GO) version
+	$(GO) mod tidy
+	$(GO) mod download
 
-docker: ## Build docker image
-	cd .docker; docker build --build-arg VERSION=$(VERSION) -t $(REPO)/$(NAME):$(VERSION) .
+fmt: ## Format Go code
+	@echo "===> Formatting Go code"
+	$(GO) fmt ./...
+	goimports -w .
 
-size: docker ## Add docker image size to READMEs
-	sed -i.bu 's/docker%20image-.*-blue/docker%20image-$(shell docker images --format "{{.Size}}" $(REPO)/$(NAME):$(VERSION)| cut -d' ' -f1)%20MB-blue/' README.md
-	sed -i.bu 's/docker%20image-.*-blue/docker%20image-$(shell docker images --format "{{.Size}}" $(REPO)/$(NAME):$(VERSION)| cut -d' ' -f1)%20MB-blue/' .docker/README.md
+lint: ## Run linters
+	@echo "===> Running linters"
+	golangci-lint run ./... || echo "Install golangci-lint: https://golangci-lint.run/usage/install/"
 
-osx: ## Install OSX dev dependencies
-	brew tap homebrew/bundle
-	brew bundle
-	gem install --no-ri --no-rdoc fpm
+build: ## Build the malice binary
+	@echo "===> Building Malice binary"
+	$(GO) build -v \
+		-ldflags "-s -w \
+			-X main.version=$(VERSION) \
+			-X main.commit=$(GIT_COMMIT) \
+			-X main.date=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ')" \
+		-o build/malice ./
 
-# TODO switch to golang/dep
-setup: ## Install all the build and lint dependencies
-	@echo "===> Installing deps"
-	go get -u github.com/jteeuwen/go-bindata/...
-	go get -u github.com/kardianos/govendor
-	go get -u golang.org/x/tools/cmd/cover
-	go get -u github.com/golang/dep/cmd/dep
-	go get -u github.com/maliceio/malice/utils/tomlupdate
-	govendor sync
+test: ## Run tests
+	@echo "===> Running tests"
+	$(GO) test -v -race -coverprofile=coverage.txt -covermode=atomic ./...
 
-test: ## Run all the tests
-	@echo "===> Running Tests"
-	echo 'mode: atomic' > coverage.tmp
-	$(SOURCE_FILES) | xargs -n1 -I{} sh -c 'go test -covermode=atomic -coverprofile=coverage.tmp {} && tail -n +2 coverage.tmp >> coverage.txt' && rm coverage.tmp
+coverage: test ## Run tests and generate coverage report
+	@echo "===> Generating coverage report"
+	go tool cover -html=coverage.txt -o coverage.html
+	@echo "Coverage report: coverage.html"
 
-cover: test ## Run all the tests and opens the coverage report
-	@echo "===> Running Cover"
-	go tool cover -html=coverage.txt
+clean: ## Clean build artifacts
+	@echo "===> Cleaning build artifacts"
+	$(GO) clean
+	rm -rf build/ dist/ coverage.txt coverage.html
 
-fmt: ## gofmt and goimports all go files
-	@echo "===> Formatting Go Files"
-	find . -name '*.go' -not -wholename './vendor/*' | while read -r file; do gofmt -w -s "$$file"; goimports -w "$$file"; done
+docker-build: ## Build Docker image for Ubuntu 22.04
+	@echo "===> Building Docker image"
+	docker build -t $(REPO)/$(NAME):$(VERSION) -f Dockerfile .
 
-lint: ## Run all the linters
-	@echo "===> Lintting"
-	gometalinter --vendor --disable-all \
-		--enable=deadcode \
-		--enable=ineffassign \
-		--enable=gosimple \
-		--enable=staticcheck \
-		--enable=gofmt \
-		--enable=goimports \
-		--enable=dupl \
-		--enable=misspell \
-		--enable=errcheck \
-		--enable=vet \
-		--enable=vetshadow \
-		--deadline=10m \
-		./...
-	markdownfmt -w README.md
-	markdownfmt -w CHANGELOG.md
-	markdownfmt -w .release/RELEASE.md
+docker-run: docker-build ## Run Docker container
+	@echo "===> Running Docker container"
+	docker run -it --rm -v /var/run/docker.sock:/var/run/docker.sock $(REPO)/$(NAME):$(VERSION)
 
-build: bindata
-	goreleaser --skip-publish --rm-dist --skip-validate
+run: build ## Run the malice binary
+	@echo "===> Running Malice"
+	./build/malice -D
 
-release: ## Create a new release from the VERSION
-	@echo "===> Creating Release"
-	git tag -a $(VERSION) -m ${MESSAGE}
-	git push origin $(VERSION)
-	# goreleaser --release-notes .release/RELEASE.md
-	goreleaser --rm-dist
+install: build ## Install the binary to GOPATH/bin
+	@echo "===> Installing Malice"
+	$(GO) install
 
-destroy: ## Remove release from the VERSION
-	@echo "===> Deleting Release"
-	rm -rf dist
-	git tag -d $(VERSION)
-	git push origin :refs/tags/$(VERSION)
+release: clean build ## Create a release
+	@echo "===> Creating release $(VERSION)"
+	mkdir -p dist
+	cp build/malice dist/malice-$(VERSION)-linux-amd64
+	@echo "Release ready: dist/malice-$(VERSION)-linux-amd64"
 
-ci: lint test ## Run all the tests and code checks
+deps: ## Show dependencies
+	@$(GO) list -m all
 
-# Absolutely awesome: http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html
-help:
-	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+deps-update: ## Update all dependencies to latest compatible versions
+	@echo "===> Updating dependencies"
+	$(GO) get -u ./...
+	$(GO) mod tidy
+
+help: ## Display this help screen
+	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+
 
 .DEFAULT_GOAL := help

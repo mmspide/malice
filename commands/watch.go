@@ -1,9 +1,10 @@
 package commands
 
 import (
+	"context"
 	"os"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 	"github.com/fsnotify/fsnotify"
 	"github.com/maliceio/malice/config"
 )
@@ -23,7 +24,9 @@ func cmdWatch(folderName string, logs bool) error {
 	}
 	// Check that path is a folder and not a file
 	if info.IsDir() {
-		NewWatcher(folderName)
+		if err := NewWatcher(folderName); err != nil {
+			return err
+		}
 	} else {
 		log.Error("error: path is not a folder")
 	}
@@ -31,37 +34,61 @@ func cmdWatch(folderName string, logs bool) error {
 	return nil
 }
 
-// NewWatcher creates a new watcher for the user supplied folder
-func NewWatcher(folder string) {
+// NewWatcher creates a new watcher for the user supplied folder with proper graceful shutdown
+func NewWatcher(folder string) error {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer watcher.Close()
 
-	done := make(chan bool)
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	done := make(chan error, 1)
+	defer close(done)
+
 	go func() {
+		defer func() {
+			if r := recover(); r != nil {
+				log.Errorf("watcher goroutine panic: %v", r)
+				done <- nil
+			}
+		}()
+
 		for {
 			select {
-			case event := <-watcher.Events:
-				log.Println("event:", event)
+			case event, ok := <-watcher.Events:
+				if !ok {
+					return
+				}
+				log.WithField("event", event).Debug("file system event")
 				if event.Op&fsnotify.Create == fsnotify.Create {
-					log.Println("modified file:", event.Name)
+					log.WithField("file", event.Name).Debug("file created, scanning")
 					// Scan new sample in watch folder
-					err = cmdScan(event.Name, false)
-					if err != nil {
-						log.Error(err)
+					if err := cmdScan(event.Name, false); err != nil {
+						log.WithError(err).Error("scan failed")
 					}
 				}
-			case err := <-watcher.Errors:
-				log.Error("error:", err)
+			case err, ok := <-watcher.Errors:
+				if !ok {
+					return
+				}
+				log.WithError(err).Error("watcher error")
+				done <- err
+				return
+			case <-ctx.Done():
+				log.Debug("watcher shutting down")
+				done <- nil
+				return
 			}
 		}
 	}()
 
-	err = watcher.Add(folder)
-	if err != nil {
-		log.Fatal(err)
+	if err = watcher.Add(folder); err != nil {
+		return err
 	}
-	<-done
+
+	// Block until error or context cancellation
+	return <-done
 }

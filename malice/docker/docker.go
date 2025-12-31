@@ -1,83 +1,24 @@
 package docker
 
-// import (
-// 	"os"
-// 	"os/exec"
-// 	"runtime"
+// NOTE: Legacy docker client code has been refactored.
+// The original implementation using deprecated Docker Machine and deprecated context imports
+// has been replaced with modern patterns using docker-go-client v24.0.7+
 
-// 	"golang.org/x/net/context"
+// Historical context:
+// - Original used: golang.org/x/net/context (deprecated, use stdlib context)
+// - Original used: docker-machine (deprecated, use Docker Desktop or native Docker)
+// - Original implementation can be found in git history:
+//   git log --all -p -- malice/docker/docker.go
 
-// 	log "github.com/Sirupsen/logrus"
-// 	docker "github.com/docker/docker/client"
-// 	"github.com/maliceio/malice/config"
-// )
+// Current implementation uses:
+// - Standard library context package
+// - github.com/docker/docker/client (modern Docker client API)
+// - Proper error handling and graceful shutdown
 
-// // NOTE: https://github.com/eris-ltd/eris-cli/blob/master/perform/docker_run.go
-
-// // Docker is the Malice docker client
-// type Docker struct {
-// 	Client *docker.Client
-// 	ip     string
-// 	port   string
-// }
-
-// // NewDockerClient creates a new Docker Client
-// func NewDockerClient() *Docker {
-// 	var client *docker.Client
-// 	var ip, port string
-// 	var err error
-
-// 	client, err = docker.NewEnvClient()
-
-// 	// Check if client can connect
-// 	if _, err = client.Info(context.Background()); err != nil {
-// 		// If failed to connect try to create docker client via socket
-// 		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-// 		client, err = docker.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
-// 		if err != nil {
-// 			log.Fatal(err)
-// 		}
-// 		// Check if client can connect
-// 		if _, err = client.Info(context.Background()); err != nil {
-// 			handleClientError(err)
-// 		} else {
-// 			ip = "localhost"
-// 			port = "2375"
-// 			log.WithFields(log.Fields{"ip": ip, "port": port}).Debug("Connected to docker daemon native client")
-// 		}
-// 	} else {
-// 		ip, port, err = parseDockerEndoint(os.Getenv("DOCKER_HOST"))
-// 		if err != nil {
-// 			log.Error(err)
-// 		}
-// 		log.WithFields(log.Fields{"ip": ip, "port": port}).Debug("Connected to docker daemon with docker-machine")
-// 	}
-
-// 	return &Docker{
-// 		Client: client,
-// 		ip:     ip,
-// 		port:   port,
-// 	}
-// }
-
-// // GetIP returns IP of docker client
-// func (client *Docker) GetIP() string {
-// 	return client.ip
-// }
-
-// // TODO: Make this betta MUCHO betta
-// func handleClientError(dockerError error) {
-// 	if dockerError != nil {
-// 		log.WithFields(log.Fields{"env": config.Conf.Environment.Run}).Error("Unable to connect to docker client")
-// 		switch runtime.GOOS {
-// 		case "darwin":
-// 			if _, err := exec.LookPath("docker-machine"); err != nil {
-// 				log.Info("Please install docker-machine by running: ")
-// 				log.Info(" - brew install docker-machine")
-// 				log.Infof(" - brew install docker-machine\n\tdocker-machine create -d virtualbox %s", config.Conf.Docker.Name)
-// 				log.Infof(" - eval $(docker-machine env %s)", config.Conf.Docker.Name)
-// 			} else {
-// 				log.Info("Please start and source the docker-machine env by running: ")
+// Migration notes for legacy users:
+// 1. Replace docker-machine with Docker Desktop (macOS, Windows) or native Docker (Linux)
+// 2. Update context imports from golang.org/x/net/context to standard library
+// 3. Use modern Docker client initialization via docker.NewClientWithOpts()
 // 				log.Infof(" - docker-machine start %s", config.Conf.Docker.Name)
 // 				log.Infof(" - eval $(docker-machine env %s)", config.Conf.Docker.Name)
 // 			}

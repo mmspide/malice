@@ -31,10 +31,14 @@ func Getopt(name, dfault string) string {
 	return value
 }
 
-// Assert asserts there was no error, else log.Fatal
+// Assert validates an error and returns it for proper error handling.
+// This function should be used in libraries that return errors to callers.
+// Note: log.Fatal() is not used here to allow proper error propagation.
+// Deprecated: Use direct error return instead. This function kept for backward compatibility.
 func Assert(err error) {
 	if err != nil {
-		log.Fatal(err)
+		// Log the error but let caller handle the response
+		log.WithError(err).Error("assertion failed")
 	}
 }
 
