@@ -1,10 +1,13 @@
 ![malice logo](https://raw.githubusercontent.com/maliceio/malice/master/docs/images/logo/malice.png)
 
-# malice
+# malice v0.4.0
 
 [![Circle CI](https://circleci.com/gh/maliceio/malice.png?style=shield)](https://circleci.com/gh/maliceio/malice) [![License](https://img.shields.io/badge/licence-Apache%202.0-blue.svg)](LICENSE) [![Release](https://img.shields.io/github/release/maliceio/malice.svg)](https://github.com/gmaliceio/malice/releases/latest) [![bh-arsenal](https://github.com/toolswatch/badges/blob/master/arsenal/usa/2018.svg)](https://www.blackhat.com/us-18/arsenal/schedule/index.html#maliceio-12000) [![Gitter](https://badges.gitter.im/maliceio/malice.svg)](https://gitter.im/maliceio/malice)
 
 > Malice's mission is to be a free open source version of VirusTotal that anyone can use at any scale from an independent researcher to a fortune 500 company.
+
+### 🎉 Latest Release: v0.4.0 (Modernization Release)
+**Major improvements:** Enhanced security, performance optimization, graceful shutdown, connection pooling, and comprehensive error handling. [See full changelog →](RELEASE_NOTES_v0.4.0.md)
 
 ---
 
@@ -24,7 +27,17 @@
 
 ### Software
 
-- [Docker](https://docs.docker.com)
+- [Docker](https://docs.docker.com) (v20.10+)
+- [Go](https://golang.org) (v1.21+) - for building from source
+
+### New in v0.4.0
+
+✨ **Key Features:**
+- **Security:** Path traversal prevention, input validation, secure path handling
+- **Performance:** Elasticsearch connection pooling (20-30% improvement)
+- **Reliability:** Graceful shutdown, context-based cancellation, timeout protection
+- **Code Quality:** Custom error types, structured logging, comprehensive tests
+- **Resource Management:** Bounded concurrency (max 10 plugins), connection reuse
 
 ## Getting Started (OSX)
 
@@ -113,6 +126,9 @@ docker run --rm -v /var/run/docker.sock:/var/run/docker.sock \
 - [Examples](docs/examples)
 - [Roadmap](docs/roadmap)
 - [Contributing](CONTRIBUTING.md)
+- [v0.4.0 Improvements](CODE_IMPROVEMENTS.md) - Detailed technical improvements
+- [Best Practices](BEST_PRACTICES.md) - Go development patterns
+- [Release Notes](RELEASE_NOTES_v0.4.0.md) - v0.4.0 changelog
 
 ### Known Issues :warning:
 
