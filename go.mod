@@ -37,5 +37,5 @@ require (
 )
 
 	replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
-	replace github.com/maliceio/malice => .
+	replace github.com/maliceio/malice => ./
 	replace github.com/docker/docker => github.com/docker/docker v24.0.7+incompatible
