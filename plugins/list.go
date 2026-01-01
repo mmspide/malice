@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/mmspide/malice/utils/clitable"
+	"github.com/maliceio/malice/utils/clitable"
 	"github.com/maliceio/malice/utils"
 )
 
