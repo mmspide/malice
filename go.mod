@@ -4,6 +4,7 @@ go 1.21
 
 require (
 	github.com/BurntSushi/toml v1.3.2
+	github.com/Sirupsen/logrus v1.9.3 // legacy import path; redirected via replace
 	github.com/dustin/go-jsonpointer v0.0.0-20160814072949-ba0abeacc3dc
 	github.com/fatih/structs v1.1.0
 	github.com/gorilla/mux v1.8.1
@@ -41,3 +42,4 @@ replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
 replace github.com/docker/docker => github.com/docker/docker v1.13.1
 replace github.com/opencontainers/runc => github.com/opencontainers/runc v0.1.1
 replace github.com/docker/distribution => github.com/docker/distribution v2.6.0+incompatible
+replace github.com/sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
