@@ -31,7 +31,7 @@ require (
 	golang.org/x/text v0.14.0
 	gopkg.in/yaml.v2 v2.4.0
 	github.com/docker/go-units v0.5.0
-	github.com/docker/distribution v2.7.1+incompatible
+	github.com/docker/distribution v2.6.0+incompatible
 	github.com/moby/term v0.5.0
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc5
@@ -40,4 +40,4 @@ require (
 replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
 replace github.com/docker/docker => github.com/docker/docker v1.13.1
 replace github.com/opencontainers/runc => github.com/opencontainers/runc v0.1.1
-replace github.com/docker/distribution => github.com/docker/distribution v2.7.1+incompatible
+replace github.com/docker/distribution => github.com/docker/distribution v2.6.0+incompatible
