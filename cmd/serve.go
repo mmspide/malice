@@ -25,7 +25,7 @@ import (
 	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/maliceio/malice/api/server"
-	"github.com/maliceio/malice/api/router"
+	"github.com/maliceio/malice/api/server/router"
 )
 
 // serveCmd represents the serve command

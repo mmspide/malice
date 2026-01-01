@@ -8,7 +8,6 @@ require (
 	github.com/fatih/structs v1.1.0
 	github.com/gorilla/mux v1.8.1
 	github.com/sirupsen/logrus v1.9.3
-	github.com/Sirupsen/logrus v1.9.3
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
 	github.com/docker/docker v24.0.7+incompatible
@@ -37,4 +36,4 @@ require (
 	github.com/opencontainers/image-spec v1.1.0-rc5
 )
 
-	replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
+replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3

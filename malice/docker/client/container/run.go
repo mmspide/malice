@@ -9,7 +9,6 @@ import (
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
 	"github.com/docker/docker/api/types/strslice"
-	"github.com/docker/docker/cli"
 	"github.com/docker/go-connections/nat"
 
 	"github.com/maliceio/malice/malice/docker/client"
