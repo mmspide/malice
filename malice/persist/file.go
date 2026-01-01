@@ -19,7 +19,7 @@ import (
 	"time"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/crackcomm/go-clitable"
+	"github.com/mmspide/malice/utils/clitable"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/api/types/network"
