@@ -1,6 +1,7 @@
 package client
 
 import (
+	"context"
 	"os"
 	"os/exec"
 	"runtime"
@@ -9,7 +10,6 @@ import (
 	"github.com/docker/docker/client"
 	"github.com/malice-plugins/pkgs/utils"
 	"github.com/maliceio/malice/config"
-	"golang.org/x/net/context"
 )
 
 // NOTE: https://github.com/eris-ltd/eris-cli/blob/master/perform/docker_run.go
@@ -30,34 +30,34 @@ func NewDockerClient() *Docker {
 	switch os := runtime.GOOS; os {
 	case "linux":
 		log.Debug("Running inside Docker...")
-		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-		docker, err = client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
-		ip = "localhost"
-		port = "2375"
 	case "darwin":
 		log.Debug("Running on Docker for Mac...")
-		defaultHeaders := map[string]string{"User-Agent": "engine-api-cli-1.0"}
-		docker, err = client.NewClient("unix:///var/run/docker.sock", "v1.22", nil, defaultHeaders)
-		ip = "localhost"
-		port = "2375"
 	case "windows":
 		log.Debug("Running on Docker for Windows or docker-machine on a Windows host...")
-		docker, err = client.NewEnvClient()
-		if err != nil {
-			log.Fatal(err)
-		}
-		ip, port, err = parseDockerEndoint(utils.Getopt("DOCKER_HOST", config.Conf.Docker.EndPoint))
 	default:
-		log.Debug("Creating NewEnvClient...")
-		docker, err = client.NewEnvClient()
-		if err != nil {
-			log.Fatal(err)
-		}
-		ip, port, err = parseDockerEndoint(utils.Getopt("DOCKER_HOST", config.Conf.Docker.EndPoint))
+		log.Debug("Creating docker client from environment...")
 	}
+
+	docker, err = client.NewClientWithOpts(client.FromEnv, client.WithAPIVersionNegotiation())
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// Populate endpoint metadata for logging purposes
+	endpoint := utils.Getopt("DOCKER_HOST", config.Conf.Docker.EndPoint)
+	if endpoint != "" {
+		ip, port, err = parseDockerEndoint(endpoint)
+		if err != nil {
+			log.WithError(err).Warn("unable to parse docker endpoint, using defaults")
+		}
+	}
+	if ip == "" {
+		ip = "localhost"
+	}
+	if port == "" {
+		port = "2375"
+	}
+
 	// Check if client can connect
 	if _, err = docker.Info(context.Background()); err != nil {
 		handleClientError(err)

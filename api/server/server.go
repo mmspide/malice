@@ -130,12 +130,6 @@ func (s *Server) serveAPI() error {
 
 	return nil
 }
-			return err
-		}
-	}
-
-	return nil
-}
 
 // HTTPServer contains an instance of http server and the listener.
 // srv *http.Server, contains configuration to create an http server and a mux router with all api end points.
@@ -156,6 +150,10 @@ func (s *HTTPServer) Close() error {
 }
 
 func (s *Server) makeHTTPHandler(handler http.HandlerFunc) http.HandlerFunc {
+	// Wrap the handler in configured middlewares (logging, etc.) before
+	// attaching request-scoped context values.
+	wrapped := s.handlerWithGlobalMiddlewares(handler)
+
 	return func(w http.ResponseWriter, r *http.Request) {
 		// Define the context that we'll pass around to share info
 		// like the docker-request-id.
@@ -166,7 +164,7 @@ func (s *Server) makeHTTPHandler(handler http.HandlerFunc) http.HandlerFunc {
 		}
 		
 		// Call the handler with context
-		handler(w, r.WithContext(ctx))
+		wrapped(w, r.WithContext(ctx))
 	}
 }
 

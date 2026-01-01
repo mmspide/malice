@@ -1,33 +1,32 @@
 package commands
 
-// AppHelpTemplate custom app help template
-var AppHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
+// AppHelpTemplate custom app help template compatible with urfave/cli v2
+var AppHelpTemplate = `Usage: {{.HelpName}} {{if .VisibleFlags}}[OPTIONS] {{end}}COMMAND [arg...]
 
 {{.Usage}}
 
-Version: {{.Version}}{{if or .Author .Email}}
+Version: {{.Version}}{{if .Authors}}
 
-Author:{{if .Author}}
-  {{.Author}}{{if .Email}} - <{{.Email}}>{{end}}{{else}}
-  {{.Email}}{{end}}{{end}}
-{{if .Flags}}
+Author:{{range .Authors}}
+  {{.}}{{end}}{{end}}
+{{if .VisibleFlags}}
 Options:
-  {{range .Flags}}{{.}}
+  {{range .VisibleFlags}}{{.}}
   {{end}}{{end}}
 Commands:
-  {{range .Commands}}{{.Name}}{{with .ShortName}}, {{.}}{{end}}{{ "\t" }}{{.Usage}}
+  {{range .Commands}}{{.Name}}{{ "\t" }}{{.Usage}}
   {{end}}
 Run '{{.Name}} COMMAND --help' for more information on a command.
 `
 
 // CommandHelpTemplate custom command help template
-var CommandHelpTemplate = `Usage: malice {{.Name}}{{if .Flags}} [OPTIONS]{{end}} [arg...]
+var CommandHelpTemplate = `Usage: {{.HelpName}}{{if .VisibleFlags}} [OPTIONS]{{end}} [arg...]
 {{.Usage}}{{if .Description}}
 
 Description:
    {{.Description}}{{end}}{{if .Flags}}
 
 Options:
-   {{range .Flags}}
+   {{range .VisibleFlags}}
    {{.}}{{end}}{{ end }}
 `

@@ -5,19 +5,19 @@ import (
 	"os"
 
 	log "github.com/sirupsen/logrus"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 var tasks = []string{"start", "stop"}
 
 // Commands are the codegangsta/cli commands for Malice
-var Commands = []cli.Command{
+var Commands = []*cli.Command{
 	{
 		Name:        "scan",
 		Usage:       "Scan a file",
 		Description: "File to be scanned.",
 		Flags: []cli.Flag{
-			cli.BoolFlag{
+			&cli.BoolFlag{
 				Name:  "logs",
 				Usage: "Display the Logs of the Plugin containers",
 			},
@@ -29,7 +29,7 @@ var Commands = []cli.Command{
 		Usage:       "Watch a folder",
 		Description: "Folder to be watched.",
 		Flags: []cli.Flag{
-			cli.BoolFlag{
+			&cli.BoolFlag{
 				Name:  "logs",
 				Usage: "Display the Logs of the Plugin containers",
 			},
@@ -42,13 +42,13 @@ var Commands = []cli.Command{
 		ArgsUsage: "hash of file to lookup `HASH`",
 		// Description: "Hash to be queried.",
 		Flags: []cli.Flag{
-			cli.BoolFlag{
+			&cli.BoolFlag{
 				Name:  "logs",
 				Usage: "Display the Logs of the Plugin containers",
 			},
 		},
 		Action: func(c *cli.Context) error {
-			if c.Args().Present() {
+			if c.Args().Len() > 0 {
 				return cmdLookUp(c.Args().First(), c.Bool("logs"))
 			}
 			log.Error("Please supply a MD5/SHA1 hash to query.")
@@ -61,7 +61,7 @@ var Commands = []cli.Command{
 		Usage:       "Start the ELK docker container",
 		Description: "This ELK container will attach to the ElasticSearch data for all previous malice scans.",
 		Flags: []cli.Flag{
-			cli.BoolFlag{
+			&cli.BoolFlag{
 				Name:  "logs",
 				Usage: "Display the Logs from the ELK Container",
 			},
@@ -96,16 +96,16 @@ var Commands = []cli.Command{
 	{
 		Name:  "plugin",
 		Usage: "List, Install or Remove Plugins",
-		Subcommands: []cli.Command{
+		Subcommands: []*cli.Command{
 			{
 				Name:  "list",
 				Usage: "list enabled installed plugins",
 				Flags: []cli.Flag{
-					cli.BoolFlag{
+					&cli.BoolFlag{
 						Name:  "all",
 						Usage: "display all installed plugins",
 					},
-					cli.BoolFlag{
+					&cli.BoolFlag{
 						Name:  "detail,d",
 						Usage: "display plugin details",
 					},
@@ -126,11 +126,11 @@ var Commands = []cli.Command{
 				Name:  "update",
 				Usage: "update plugin",
 				Flags: []cli.Flag{
-					cli.BoolFlag{
+					&cli.BoolFlag{
 						Name:  "all",
 						Usage: "update all installed plugins",
 					},
-					cli.BoolFlag{
+					&cli.BoolFlag{
 						Name:  "s,source",
 						Usage: "update plugin from source repo",
 					},
@@ -140,7 +140,7 @@ var Commands = []cli.Command{
 		},
 		BashComplete: func(c *cli.Context) {
 			// This will complete if no args are passed
-			if len(c.Args()) > 0 {
+			if c.Args().Len() > 0 {
 				return
 			}
 			for _, t := range tasks {

@@ -13,7 +13,7 @@ import (
 	"github.com/fatih/structs"
 	"github.com/malice-plugins/pkgs/database/elasticsearch"
 	"github.com/malice-plugins/pkgs/utils"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 // Version stores the plugin's version
@@ -73,21 +73,20 @@ func scanFile(path string, all bool) pluginResults {
 	return pResults
 }
 
-var appHelpTemplate = `Usage: {{.Name}} {{if .Flags}}[OPTIONS] {{end}}COMMAND [arg...]
+var appHelpTemplate = `Usage: {{.HelpName}} {{if .VisibleFlags}}[OPTIONS] {{end}}COMMAND [arg...]
 
 {{.Usage}}
 
-Version: {{.Version}}{{if or .Author .Email}}
+Version: {{.Version}}{{if .Authors}}
 
-Author:{{if .Author}}
-  {{.Author}}{{if .Email}} - <{{.Email}}>{{end}}{{else}}
-  {{.Email}}{{end}}{{end}}
-{{if .Flags}}
+Author:{{range .Authors}}
+  {{.}}{{end}}{{end}}
+{{if .VisibleFlags}}
 Options:
-  {{range .Flags}}{{.}}
+  {{range .VisibleFlags}}{{.}}
   {{end}}{{end}}
 Commands:
-  {{range .Commands}}{{.Name}}{{with .ShortName}}, {{.}}{{end}}{{ "\t" }}{{.Usage}}
+  {{range .Commands}}{{.Name}}{{ "\t" }}{{.Usage}}
   {{end}}
 Run '{{.Name}} COMMAND --help' for more information on a command.
 `
@@ -105,33 +104,33 @@ func main() {
 	var all bool
 	var elasticsearch string
 	app.Flags = []cli.Flag{
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:  "verbose, V",
 			Usage: "verbose output",
 		},
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:        "elasticsearch",
 			Value:       "",
 			Usage:       "elasticsearch address for Malice to store results",
-			EnvVar:      "MALICE_ELASTICSEARCH",
+			EnvVars:     []string{"MALICE_ELASTICSEARCH"},
 			Destination: &elasticsearch,
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:   "post, p",
 			Usage:  "POST results to Malice webhook",
-			EnvVar: "MALICE_ENDPOINT",
+			EnvVars: []string{"MALICE_ENDPOINT"},
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:   "proxy, x",
 			Usage:  "proxy settings for Malice webhook endpoint",
-			EnvVar: "MALICE_PROXY",
+			EnvVars: []string{"MALICE_PROXY"},
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:        "table, t",
 			Usage:       "output as Markdown table",
 			Destination: &table,
 		},
-		cli.BoolFlag{
+		&cli.BoolFlag{
 			Name:        "all, a",
 			Usage:       "output ascii/utf-16 strings",
 			Destination: &all,
@@ -139,7 +138,7 @@ func main() {
 	}
 	app.ArgsUsage = "FILE to scan with {{ plugin_name }}"
 	app.Action = func(c *cli.Context) error {
-		if c.Args().Present() {
+		if c.Args().Len() > 0 {
 			path := c.Args().First()
 			// Check that file exists
 			if _, err := os.Stat(path); os.IsNotExist(err) {

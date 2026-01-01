@@ -11,7 +11,7 @@ import (
 
 	"github.com/BurntSushi/toml"
 	"github.com/maliceio/malice/config"
-	"github.com/urfave/cli"
+	"github.com/urfave/cli/v2"
 )
 
 var (
@@ -41,7 +41,7 @@ func main() {
 	app.Usage = "Update Version in Malice Config TOML"
 	app.ArgsUsage = "malice VERSION"
 	app.Flags = []cli.Flag{
-		cli.StringFlag{
+		&cli.StringFlag{
 			Name:        "path",
 			Value:       "",
 			Usage:       "path to malice config TOML",
@@ -52,7 +52,7 @@ func main() {
 		if path == "" {
 			log.Fatal(fmt.Errorf("please supply `--path` of config.toml flle"))
 		}
-		if c.Args().Present() {
+		if c.Args().Len() > 0 {
 			// read VERSION
 			ver := strings.TrimSpace(string(c.Args().First()))
 			// load config from TOML
