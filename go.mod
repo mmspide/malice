@@ -16,7 +16,6 @@ require (
 )
 require (
 	github.com/hashicorp/hcl v1.0.0
-	github.com/inconshreveable/log15/v3 v3.0.0-testing.5+incompatible
 	github.com/magiconair/properties v1.8.7
 	github.com/mattn/go-colorable v0.1.13
 	github.com/mattn/go-isatty v0.0.20
