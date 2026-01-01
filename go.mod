@@ -11,7 +11,7 @@ require (
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
-	github.com/docker/docker v24.0.7+incompatible
+	github.com/docker/docker v20.10.24+incompatible
 	github.com/docker/go-connections v0.5.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
 )
