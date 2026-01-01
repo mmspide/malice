@@ -38,3 +38,4 @@ require (
 )
 
 replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
+replace github.com/docker/docker => github.com/docker/docker v20.10.24+incompatible
