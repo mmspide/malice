@@ -8,7 +8,7 @@ import (
 	"github.com/maliceio/malice/malice/docker/client"
 	"github.com/maliceio/malice/malice/docker/client/container"
 	"github.com/maliceio/malice/malice/ui"
-	"github.com/pkg/errors"
+	"github.com/maliceio/malice/malice/errors"
 )
 
 func cmdELK(logs bool) error {
@@ -18,7 +18,7 @@ func cmdELK(logs bool) error {
 	if _, running, _ := container.Running(docker, config.Conf.DB.Name); !running {
 		err := database.Start(docker, elasticsearch.Database{URL: config.Conf.DB.URL}, logs)
 		if err != nil {
-			return errors.Wrap(err, "failed to start to database")
+			return errors.NewScanError("elk-startup", "db_start_failed", "failed to start database", err)
 		}
 	} else {
 		log.Warnf("container %s is already running", config.Conf.DB.Name)
@@ -27,7 +27,7 @@ func cmdELK(logs bool) error {
 	if _, running, _ := container.Running(docker, config.Conf.UI.Name); !running {
 		_, err := ui.Start(docker, logs)
 		if err != nil {
-			return errors.Wrap(err, "failed to start to UI")
+			return errors.NewScanError("elk-startup", "ui_start_failed", "failed to start UI", err)
 		}
 	} else {
 		log.Warnf("container %s is already running", config.Conf.UI.Name)

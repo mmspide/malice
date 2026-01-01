@@ -2,7 +2,6 @@ package server
 
 import (
 	"net/http"
-	"log"
 
 	"github.com/sirupsen/logrus"
 )
@@ -27,8 +26,11 @@ func (s *Server) handlerWithGlobalMiddlewares(handler http.HandlerFunc) http.Han
 		// Wrap with debug logging
 		next = func(h http.HandlerFunc) http.HandlerFunc {
 			return func(w http.ResponseWriter, r *http.Request) {
-				log.Printf("DEBUG: %s %s", r.Method, r.URL.Path)
+				logrus.Debugf("DEBUG: %s %s", r.Method, r.URL.Path)
 				h(w, r)
 			}
 		}(next)
+	}
+
+	return next
 }

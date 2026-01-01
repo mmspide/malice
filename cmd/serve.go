@@ -15,38 +15,99 @@
 package cmd
 
 import (
+	"context"
 	"fmt"
+	"net"
+	"os"
+	"os/signal"
+	"syscall"
 
+	log "github.com/sirupsen/logrus"
 	"github.com/spf13/cobra"
+	"github.com/maliceio/malice/api/server"
+	"github.com/maliceio/malice/api/router"
 )
 
 // serveCmd represents the serve command
 var serveCmd = &cobra.Command{
 	Use:   "serve",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	Run: func(cmd *cobra.Command, args []string) {
-		// TODO: Work your own magic here
-		fmt.Println("serve called")
+	Short: "Start Malice API server",
+	Long: `Start the Malice REST API server for data access and analysis.
+	
+The server listens on the configured port and provides endpoints for:
+- Scanning files
+- Querying results
+- Managing plugins
+- Accessing analysis data`,
+	RunE: func(cmd *cobra.Command, args []string) error {
+		return runServe()
 	},
+}
+
+func runServe() error {
+	// Create server configuration
+	cfg := &server.Config{
+		Logging:     true,
+		EnableCors:  true,
+		CorsHeaders: "Content-Type, X-Malice-API-Version",
+		Version:     "0.4.0",
+	}
+
+	// Create new server
+	srv := server.New(cfg)
+	defer srv.Close()
+
+	// Initialize routes
+	routes, err := router.GetRoutes()
+	if err != nil {
+		return fmt.Errorf("failed to get routes: %w", err)
+	}
+	srv.InitRouter(routes)
+
+	// Accept connections on localhost:8080
+	listener, err := net.Listen("tcp", ":8080")
+	if err != nil {
+		return fmt.Errorf("failed to create listener: %w", err)
+	}
+	defer listener.Close()
+
+	srv.Accept("localhost:8080", listener)
+
+	// Handle graceful shutdown
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		sig := <-sigChan
+		log.Infof("Received signal: %v, shutting down gracefully", sig)
+		srv.Close()
+	}()
+
+	// Run server
+	errChan := make(chan error, 1)
+	go func() {
+		srv.Wait(errChan)
+	}()
+
+	// Wait for error or context cancellation
+	select {
+	case err := <-errChan:
+		if err != nil {
+			log.Errorf("Server error: %v", err)
+			return err
+		}
+	case <-context.Background().Done():
+		log.Info("Server stopped")
+	}
+
+	log.Info("Malice API server started successfully on :8080")
+	log.Info("Visit http://localhost:8080 to access the API")
+	return nil
 }
 
 func init() {
 	RootCmd.AddCommand(serveCmd)
 
-	// Here you will define your flags and configuration settings.
-
-	// Cobra supports Persistent Flags which will work for this command
-	// and all subcommands, e.g.:
-	// serveCmd.PersistentFlags().String("foo", "", "A help for foo")
-
-	// Cobra supports local flags which will only run when this command
-	// is called directly, e.g.:
-	// serveCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
-
+	serveCmd.Flags().IntP("port", "p", 8080, "API server port")
+	serveCmd.Flags().BoolP("debug", "d", false, "Enable debug logging")
 }
