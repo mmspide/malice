@@ -4,7 +4,7 @@ import (
 	"sync"
 
 	"github.com/malice-plugins/pkgs/database/elasticsearch"
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 // Pool manages Elasticsearch client connections with singleton pattern

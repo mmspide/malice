@@ -7,7 +7,7 @@ require (
 	github.com/dustin/go-jsonpointer v0.0.0-20160814072949-ba0abeacc3dc
 	github.com/fatih/structs v1.1.0
 	github.com/gorilla/mux v1.8.1
-	github.com/Sirupsen/logrus v1.9.3
+	github.com/sirupsen/logrus v1.9.3
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
