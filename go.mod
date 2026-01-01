@@ -3,9 +3,9 @@ module github.com/maliceio/malice
 go 1.21
 
 replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
-replace github.com/docker/docker => github.com/docker/engine v20.10.24+incompatible
-replace github.com/opencontainers/runc => github.com/opencontainers/runc v1.1.12
-replace github.com/docker/distribution => github.com/docker/distribution v2.8.3+incompatible
+replace github.com/docker/docker => github.com/docker/docker v1.13.1
+replace github.com/opencontainers/runc => github.com/opencontainers/runc v0.1.1
+replace github.com/docker/distribution => github.com/docker/distribution v2.6.0+incompatible
 
 require (
 	github.com/BurntSushi/toml v1.3.2
