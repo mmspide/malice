@@ -48,6 +48,7 @@ replace github.com/moby/term => ./vendor/github.com/moby/term
 replace github.com/opencontainers/go-digest => ./vendor/github.com/opencontainers/go-digest
 replace github.com/opencontainers/image-spec => ./vendor/github.com/opencontainers/image-spec
 
+
 require (
 	github.com/hashicorp/hcl v1.0.0
 	github.com/inconshreveable/log15 v2.0.0+incompatible
