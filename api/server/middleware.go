@@ -3,7 +3,7 @@ package server
 import (
 	"net/http"
 
-	"github.com/sirupsen/logrus"
+	"github.com/Sirupsen/logrus"
 )
 
 // handlerWithGlobalMiddlewares wraps the handler function for a request with

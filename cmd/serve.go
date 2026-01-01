@@ -22,7 +22,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 	"github.com/spf13/cobra"
 	"github.com/maliceio/malice/api/server"
 	"github.com/maliceio/malice/api/server/router"

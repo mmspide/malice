@@ -4,7 +4,7 @@ import (
 	"context"
 	"os"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 	"github.com/fsnotify/fsnotify"
 	"github.com/maliceio/malice/config"
 )
