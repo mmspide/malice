@@ -6,7 +6,7 @@ import (
 	"runtime"
 	"strconv"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 	"github.com/urfave/cli/v2"
 
 	"github.com/maliceio/malice/commands"

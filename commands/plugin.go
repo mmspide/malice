@@ -3,7 +3,7 @@ package commands
 import (
 	"os"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 	"github.com/maliceio/malice/malice/docker/client"
 	"github.com/maliceio/malice/plugins"
 )

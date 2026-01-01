@@ -2,20 +2,23 @@ module github.com/maliceio/malice
 
 go 1.21
 
+replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
+replace github.com/docker/docker => github.com/docker/engine v20.10.24+incompatible
+replace github.com/opencontainers/runc => github.com/opencontainers/runc v1.1.12
+replace github.com/docker/distribution => github.com/docker/distribution v2.8.3+incompatible
+
 require (
 	github.com/BurntSushi/toml v1.3.2
 	github.com/dustin/go-jsonpointer v0.0.0-20160814072949-ba0abeacc3dc
 	github.com/fatih/structs v1.1.0
 	github.com/gorilla/mux v1.8.1
-	github.com/sirupsen/logrus v1.9.3
+	github.com/Sirupsen/logrus v1.9.3 // اینجا باید حتما Sirupsen باشه چون قدیمیه
 	github.com/urfave/cli/v2 v2.25.7
 	github.com/spf13/cobra v1.7.0
 	github.com/spf13/viper v1.17.0
 	github.com/docker/docker v1.13.1
 	github.com/docker/go-connections v0.5.0
 	gopkg.in/natefinch/lumberjack.v2 v2.2.1
-)
-require (
 	github.com/hashicorp/hcl v1.0.0
 	github.com/magiconair/properties v1.8.7
 	github.com/mattn/go-colorable v0.1.13
@@ -36,8 +39,3 @@ require (
 	github.com/opencontainers/go-digest v1.0.0
 	github.com/opencontainers/image-spec v1.1.0-rc5
 )
-
-replace github.com/Sirupsen/logrus => github.com/sirupsen/logrus v1.9.3
-replace github.com/docker/docker => github.com/docker/docker v1.13.1
-replace github.com/opencontainers/runc => github.com/opencontainers/runc v0.1.1
-replace github.com/docker/distribution => github.com/docker/distribution v2.6.0+incompatible

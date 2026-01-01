@@ -10,7 +10,7 @@ import (
 
 	"regexp"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 )
 
 // Exists returns type.NetworkResource and true

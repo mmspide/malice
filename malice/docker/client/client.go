@@ -6,7 +6,7 @@ import (
 	"os/exec"
 	"runtime"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 	"github.com/docker/docker/client"
 	"github.com/malice-plugins/pkgs/utils"
 	"github.com/maliceio/malice/config"

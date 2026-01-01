@@ -6,7 +6,7 @@ import (
 	"path"
 
 	"github.com/BurntSushi/toml"
-	log "github.com/sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 	er "github.com/maliceio/malice/malice/errors"
 	"github.com/maliceio/malice/malice/maldirs"
 )

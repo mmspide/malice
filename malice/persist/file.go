@@ -18,7 +18,7 @@ import (
 	"strings"
 	"time"
 
-	log "github.com/sirupsen/logrus"
+	log "github.com/Sirupsen/logrus"
 	"github.com/maliceio/malice/utils/clitable"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
