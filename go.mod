@@ -4,7 +4,6 @@ go 1.21
 
 require (
 	github.com/BurntSushi/toml v1.3.2
-	github.com/Sirupsen/logrus v1.9.3 // indirect; unified via replace to lowercase
 	github.com/dustin/go-jsonpointer v0.0.0-20160814072949-ba0abeacc3dc
 	github.com/fatih/structs v1.1.0
 	github.com/gorilla/mux v1.8.1
