@@ -1,4 +1,4 @@
-module github.com/maliceio/malice
+module github.com/mmspide/malice
 
 go 1.21
 
